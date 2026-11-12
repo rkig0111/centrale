@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title></title>
+        <meta http-equiv="refresh" content="3">
+        <link rel="stylesheet" type="text/css" href="../static/centrale2.css">
+    </head>
+    <body>
+        <h2><center><p>Date and time :  {{time}}</p></center></h2>
+        <Label>Premier check box</label>
+        <div class="onoffswitch">
+            <input onchange="updateOnOff(this);" type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="my1offswitch" checked>
+            <label class="onoffswitch-label" for="my1offswitch">
+                <span class="onoffswitch-inner"></span>
+                <span class="onoffswitch-switch"></span>
+            </label>
+        </div>
+ 
+        <script>
+            function updateOnOff(elt) {
+                var request = new XMLHttpRequest();
+                if (elt.checked) {
+                    window.location.assign("/on");
+                } else {
+                    window.location.assign("/off");
+                }
+                request.send();
+            }
+        </script>
+ 
+    </body>
+</html>

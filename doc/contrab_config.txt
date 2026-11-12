@@ -1,0 +1,10 @@
+editer le crontab:
+
+	crontab -e
+
+ajouter la ligne au crontab:
+
+	#    @reboot /home/romu/developpement/SELENIUM/centrale.sh
+    @reboot cd /home/romu/developpement/SELENIUM/ && source .centrale/bin/activate && home/romu/developpement/SELENIUM/.centrale/bin/python /home/romu/developpement/SELENIUM/.centrale/bin/gunicorn --bind 0.0.0.0:5000 --workers 1 index:app
+    @reboot /home/romu/developpement/SELENIUM/.centrale/bin/python /home/romu/developpement/SELENIUM/.centrale/bin/gunicorn --bind 0.0.0.0:5000 --workers 1 index:app
+    @reboot /home/romu/developpement/SELENIUM/.centrale/bin/python /home/romu/developpement/SELENIUM/centrale.py

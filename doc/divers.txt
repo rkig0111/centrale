@@ -1,0 +1,205 @@
+pour travailler avec git en local, j'ai prévu de travailler avec git 
+avec le serveur(mon PC de developpement) et d'y accéder grace à ssh.
+
+sudo apt install sshfs
+mkdir ~/mon_dossier_sftp
+sshfs utilisateur@serveur_distant:chemin/distant ~/mon_dossier_sftp
+aller dans le repertoire destinataire du clone:
+cd rep_clone
+git clone SELENIUM
+ln -s ~/mon_dossier_sftp ~/mon_lien
+fusermount -u ~/mon_dossier_sftp
+
+cd SELENIUM
+python -m venv .centrale
+source .centrale/bin/activate
+pip install selenium
+# pip install webdriver_manager
+sudo apt-get install chromium-chromedriver
+which chromedriver
+
+
+######   INSTALL NGINX    #######
+
+sudo apt update
+sudo apt upgrade
+sudo apt install nginx
+sudo systemctl enable --now nginx         # démarrer et activer au boot
+
+sudo mkdir -p /var/www/centrale
+echo '<h1>Hello Nginx!</h1>' | sudo tee /var/www/centrale/index.html
+
+sudo tee /etc/nginx/conf.d/centrale.conf << 'EOF'
+server {
+    listen 80;
+    server_name centrale.local;
+
+    root /var/www/centrale;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+}
+EOF
+
+
+sudo tee /etc/nginx/sites-available/joroadju.freeboxos.fr << 'EOF'
+server {
+    listen 80;
+    server_name centrale.local;
+
+    root /var/www/centrale;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+}
+EOF
+
+
+# sudo ln -s /etc/nginx/sites-available/joroadju.freeboxos.fr /etc/nginx/sites-enabled/
+# sudo nano /etc/nginx/sites-available/centrale.conf
+# sudo ln -s /etc/nginx/sites-available/centrale.conf /etc/nginx/sites-enabled/
+
+# rentre en conflit avec notre config sur le port 80
+# on supprime le lien par defaut :
+
+sudo rm /etc/nginx/sites-enabled/default      
+
+
+
+
+apt-get update
+apt-get  install certbot python3-certbot-nginx
+
+sudo certbot --nginx -d joroadju.freeboxos.fr
+
+sudo ufw allow 'Nginx Full'
+sudo ufw allow OpenSSH
+sudo ufw enable
+sudo ufw status
+
+
+###########################################
+
+pip install flask
+pip install RPi.GPIO
+
+import os
+import RPi.GPIO as GPIO
+from flask import Flask, render_template, Response
+import datetime
+
+GPIO.setmode(GPIO.BCM)
+dataPin=[i for i in range(2,28)]
+for dp in dataPin: GPIO.setup(dp,GPIO.IN)#,pull_up_down=GPIO.PUD_UP)
+
+data=[]
+now=datetime.datetime.now()
+timeString=now.strftime("%Y-%m-%d %H:%M")
+templateData={
+    'title':'Raspberry Pi 3B+ Web Controller',
+    'time':timeString,
+    'data':data,
+}
+
+def getData():
+    data=[]
+    for i,dp in enumerate(dataPin): data.append(GPIO.input(dataPin[i]))
+    
+    return data
+
+app=Flask(__name__)
+    
+@app.route('/')
+def index():
+    #return 'hello world!'
+    now=datetime.datetime.now()
+    timeString=now.strftime("%Y-%m-%d %H:%M")
+    data=getData()
+    templateData={
+        'title':'Raspberry Pi 3B+ Web Controller',
+        'time':timeString,
+        'data':data,
+    }
+    #return render_template('rpi_index.html',**templateData)
+    return render_template('rpi3b_webcontroller.html',**templateData)           
+
+@app.route('/<actionid>') 
+def handleRequest(actionid):
+    print("Button pressed : {}".format(actionid))
+    return "OK 200"   
+                              
+if __name__=='__main__':
+    os.system("sudo rm -r  ~/.cache/chromium/Default/Cache/*")
+    app.run(debug=True, port=5000, host='0.0.0.0',threaded=True)
+    #local web server http://192.168.1.200:5000/
+    #after Port forwarding Manipulation http://xx.xx.xx.xx:5000/
+
+
+
+###########################################
+
+pip install python-memcached
+
+# dans le 1er script:
+import memcache
+shared = memcache.Client(['127.0.0.1:11211'], debug=0)
+shared.set('Value', 'Hello_bis_2', time=5)
+
+# dans le 2eme script:
+import memcache
+shared = memcache.Client(['127.0.0.1:11211'], debug=0)    
+print(shared.get('Value'))
+
+
+###########################################
+
+pour démarrage auto à la mise en route du Raspberry Pi:
+
+#! /usr/bin/bash
+cd /home/romu/developpement/SELENIUM
+source .centrale/bin/activate
+python /home/romu/developpement/SELENIUM/centrale.py
+
+
+###########################################
+
+pip install gunicorn
+gunicorn --bind 0.0.0.0:8000 --workers 1 'centrale:app'
+
+
+###########################################
+
+
+
+à enlever :
+
+pip install fastapi uvicorn
+creer le fichier main.py
+---------
+from fastapi import FastAPI
+app = FastAPI()
+
+donnees = {‘lieux’: [‘Paris’,’Lyon’,’Marseille’]}
+
+@app.get(‘/lieux’)
+async def get_lieux():
+  return {‘donnees’: donnees}
+
+@app.post(‘/lieux’)
+async def post_lieu(lieu: str):
+  if lieu in donnees[‘lieux’]:
+    return {‘donnees’: donnees, ‘message’: ‘existe déjà’}
+  donnees[‘lieux’].append(lieu)
+  return {‘donnees’: donnees, ‘message’: ‘ajouté’}
+
+@app.delete(‘/lieux’)
+async def delete_lieu(lieu: str):
+  if lieu in donnees[‘lieux’]:
+    donnees[‘lieux’].remove(lieu)
+    return {‘donnees’: donnees, ‘message’:’supprimé’}
+  return {‘donnees’: donnees, ‘message’: « n’existe pas »}
+---------

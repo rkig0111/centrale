@@ -1,0 +1,73 @@
+﻿Envoi de SMS via l'API 123-SMS.net - exemple Python 3
+=====================================================
+
+1. Prerequis : Python 3.6 ou superieur (aucune bibliotheque a installer).
+2. Ouvrez 123sms.py et renseignez IDENTIFIANT (identifiant de votre compte) et
+   CLE_API (espace client > API > Generer Cle API).
+3. Lancez :  python 123sms.py
+4. La fonction envoyer_sms(numero, message) est reutilisable telle quelle
+   dans vos projets.
+
+L'appel utilise HTTPS. Documentation complete et codes reponse :
+https://www.123-sms.net/developpeurs-api.php
+Support : contact@123-sms.net
+
+
+
+
+
+
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+# =====================================================================
+#  Envoi de SMS via l'API 123-SMS.net  (Python 3, sans dependance)
+#  Documentation : https://www.123-sms.net/developpeurs-api.php
+#  (c) 123-SMS.net - licence MIT, reutilisation libre
+# =====================================================================
+import urllib.parse
+import urllib.request
+
+API_URL = "https://www.123-sms.net/http.php"
+
+# --- Vos identifiants (espace client 123-SMS.net) --------------------
+IDENTIFIANT   = "votre_identifiant"   # identifiant du compte
+CLE_API = "XXXXXX"                   # cle API : espace client > API > Generer Cle API
+
+
+def envoyer_sms(numero: str, message: str) -> str:
+    """Envoie un SMS et retourne le code reponse de l'API."""
+    params = urllib.parse.urlencode({
+        "email": IDENTIFIANT,
+        "pass": CLE_API,
+        "numero": numero,
+        "message": message,
+    })
+    with urllib.request.urlopen(API_URL + "?" + params, timeout=15) as reponse:
+        return reponse.read().decode("utf-8", "replace").strip()
+
+
+if __name__ == "__main__":
+    code = envoyer_sms("0612345678", "Test 123-SMS depuis Python !")
+    print("Reponse de l'API :", code)
+    # Le detail des codes reponse figure dans la documentation technique :
+    # https://www.123-sms.net/documentations.php
+
+
+
+
+
+
+TARIFS:
+
+
+Quantité    PU HT       Total HT    Total TTC
+20          0,23 €      4,60 €      5,50 €
+100         0,13 €      13 €        15,55 €
+500         0,12 €      60 €        71,76 €
+1000        0,11 €      110 €       131,56 €
+2500        0,10 €      250 €       299 €
+5000        0,095 €     475 €       568,10 €
+10000       0,09 €      900 €       1076,40 €
+25000       0,085 €     2125 €      2541,5 €
+50000       0,08 €      4000 €      4784 €
+100000      0,075 €     7500 €      8970 €

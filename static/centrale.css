@@ -1,0 +1,78 @@
+:root { 
+  --main-color: #3AAA35;
+  --colorabc: #7AAA35;
+  --colora: #9AAA35;
+  --colorb: #BAAA35;
+  --colorc: #DAAA35;
+}
+
+body{
+  background-color:#70706F;
+}
+
+h1{
+    color:#3aaa35;
+}
+
+h3{
+  #width:100%;
+  border: 3px solid #3AAA35;
+  border-radius: 6px;
+  overflow: hidden; 
+  text-align:center;
+  padding:20px;
+}
+
+
+button{
+  width:150px;
+  height:80px;
+  border-style: solid;
+  border-color: grey;
+  color: white;
+  text-align: center;
+  vertical-align:middle;
+  display: inline-block;
+  font-size: 20px;
+  border-radius: 12px;
+  transition-duration: 0.1s;
+  margin: 5px;
+}
+button:hover{
+  background-color: #6CCF70; /* Green */
+  color: white;
+}
+
+#zoneabcon{
+  width: 480px;
+  height: 80px;
+}
+
+#zoneabcoff{
+  width: 350px;
+  height: 80px;
+  border-color: orange;
+}
+
+#zonetest{
+  width: 150px;
+  height: 80px;
+  border-color: orange;
+}
+
+.colorabc {
+  background-color: var(--colorabc);
+}
+
+.colora {
+  background-color: var(--colora);
+}
+
+.colorb {
+  background-color: var(--colorb);
+}
+
+.colorc {
+  background-color: var(--colorc);
+}
+
