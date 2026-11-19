@@ -16,8 +16,8 @@ tous mes projets sont dans ~/developpement/:
 # pour savoir où se trouve l'executable chromedriver, on en a besoin dans centrale.py (variable 'service')
     which chromedriver   
 
-# il faut remplir impérativement le fichier 'centrale.ini' qui centralise un peu toutes les variables dont ont a besoin.
-# c' est assez explicite. besoin surtout de l' adresse IP de la centrale et des codes d'accès pour s'y connecter.
+# il faut adapter le fichier 'centrale_a_modifier.ini' à sa configuration et le renommer 'centrale.ini'. Il centralise un peu toutes les variables dont ont a besoin.
+# c'est assez explicite. besoin surtout de l' adresse IP de la centrale et des codes d'accès pour s'y connecter.
 
 Dans le script 'centrale.py' j'ai essayé de documenter un max de choses en allant.
 j'espère seulement être le plus compréhensible possible..  ;-)
