@@ -1,0 +1,8 @@
+editer le crontab:
+
+	crontab -e
+
+
+ajouter la ligne :
+
+	@reboot /home/romu/developpement/SELENIUM/centrale.sh  >> /home/romu/developpement/cron_centrale.log 2>&1

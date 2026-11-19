@@ -11,10 +11,9 @@ en route et arrêts des zones prévues sur l' application de la marque.
 CURL doit être installé sur votre système pour l'envoi des SMS.
 Free propose un portail dédié pour cela.
 Je ne sais pas si les autres opérateurs proposent ce service.
-J'ai vu qu'il existait un service 'https://www.123-sms.net/' qui le 
+J'ai vu qu'il existait un service 'https://www.123-sms.net/' qui le
 propose pour pas trop cher. Voir le fichier '123SMS.txt' pour plus d'infos
 j'ai adapté le programme pour l'utiliser au cas où...
-PS: je ne fais pas de pub pour eux et cela ne me rpporte rien !  ;-)
 """
 
 import time
@@ -105,12 +104,9 @@ def trouverInstanceServeur():
 logging.config.dictConfig(logger_config)"""
 
 DEBUG = 0
-# index_proc = subprocess.run("python3 /home/romu/developpement/SELENIUM/web/index.py &", shell=True)
-# index_proc = subprocess.run("gunicorn --bind 0.0.0.0:5000 --workers 1 'index:app' &", shell=True)
+
 print("start...")
 
-# shared = memcache.Client(['127.0.0.1:11211'], debug=0)
-# shared.set('Value', 'Hello', time=5) 
 shared = memcache.Client(['127.0.0.1:11211'], debug=DEBUG)
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -128,7 +124,7 @@ CODE = {}
 MOBILE = {}
 IP = parser.get('centrale', 'ip')
 PORT = int(parser.get('serv_web', 'port'))
-# recupération des variables pour envoi SMS FREE 
+# recupération des variables pour envoi SMS FREE
 SMS_FREE = parser.get('sms_free', 'sms_free')
 if SMS_FREE == 'True':
     USER = parser.get('sms_free', 'user')
@@ -145,20 +141,20 @@ if SMS_123 == 'True':
 
 for name, value in parser.items('authentification'):
     CODE[name] = value
-    
-# print(f'IP : {IP}') 
-# print(f'PORT : {PORT}') 
+
+# print(f'IP : {IP}')
+# print(f'PORT : {PORT}')
 # print(f'SMS_FREE : {SMS_FREE}')
 # if SMS_FREE == 'True':
-#     print(f'USER : {USER}') 
-#     print(f'PWD : {PWD}') 
-# # print(f'CODE : {CODE}') 
+#     print(f'USER : {USER}')
+#     print(f'PWD : {PWD}')
+# # print(f'CODE : {CODE}')
 # print(f'SMS_123 : {SMS_123}')
 # if SMS_123 == 'True':
-#     print(f'EMAIL : {EMAIL}') 
+#     print(f'EMAIL : {EMAIL}')
 #     print(f'CLE_API : {CLE_API}')
 #     print(f'MOBILE : {MOBILE}')
-    
+
 options = webdriver.ChromeOptions()
 
 if platform.machine() == "aarch64":                # Raspberry pi
@@ -166,12 +162,12 @@ if platform.machine() == "aarch64":                # Raspberry pi
     service = Service(r"/usr/bin/chromedriver")
     options.binary_location = chromium_path
 else:
-    brave_path = r"/usr/bin/brave-browser-stable"  # mon linux AMD
-    service = Service(r"/home/kligliro/developpement/techno_web/SELENIUM/chrome_driver_104.0.5112.79/chromedriver")
-    options.binary_location = brave_path
+    chromium_path = r"/usr/bin/chromium-browser"  # mon linux AMD
+    service = Service(r"/home/kligliro/.local/bin/chromedriver")
+    options.binary_location = chromium_path
 
 # Pour le passage des options à Selenium avec python, obtenu des infos sur Stack Overflow :
-# Source - https://stackoverflow.com/a/76364265
+# Source - https://stackoverflow.com/a/76364265/home/kligliro/.local/bin/chromedriver
 # Posted by kit4py, modified by community. See post 'Timeline' for change history
 # Retrieved 2026-10-07, License - CC BY-SA 4.0
 
@@ -206,6 +202,7 @@ options.add_argument("--headless=new")
 options.add_argument("--no-sandbox")
 options.add_argument("--disable-dev-shm-usage")
 options.add_argument("--window-size=1024,768")
+options.add_argument("--remote-debugging-pipe")
 driver = webdriver.Chrome(service=service, options=options)
 url = f"http://{IP}/fr/login.htm"
 # print(f"url = {url}")
@@ -254,8 +251,8 @@ BTN_ZONE = ["btn_zone_on_A",
 # dois l' envoyer par SMS. Je suis chez 'free' et il suffit d' activer l'option 'envoi SMS'
 # et récupérer son token (dans le compte mobile).
 # Pour les autres fournisseurs d'accès, à voir de votre côté et peut-être même contribuer
-# à l'amélioration du soft à ce niveau. J'ai vu que du côté Orange, c'est cuit !!! ils ont 
-# enlevé l'option il y a quelques années déjà !  :-( 
+# à l'amélioration du soft à ce niveau. J'ai vu que du côté Orange, c'est cuit !!! ils ont
+# enlevé l'option il y a quelques années déjà !  :-(
 # le principe est simple:
 # Si je ne vois pas l'une des CLASS_NAME surveillées il suffit d'appeler le lien suivant:
 # https://smsapi.free-mobile.fr/sendmsg?user=monn°user&pass=monpasswd&msg=alarme_CLASS_NAME
@@ -276,11 +273,11 @@ def send_123_sms(numero: str, message: str) -> str:
         "pass": CLE_API,
         "numero": numero,
         "message": message,
-    })    
+    })
     # print(f'envoi 123_sms : {API_URL}?{params}')
     with urllib.request.urlopen(API_URL + "?" + params, timeout=15) as reponse:
         return reponse.read().decode("utf-8", "replace").strip()
-    
+
 def send_sms_free(alarm):
     # print("-->  dans send_sms_free() : envoi SMS...")
     alarm = alarm.replace(" ", "%20")
@@ -293,7 +290,7 @@ def login():
     # print("-->  dans login() : ouverture session...")
     # print("------ ACCES AU PORTAIL ------")
     try:
-        # recherche dans la page du n° d'authentification 
+        # recherche dans la page du n° d'authentification
         search_input = driver.find_element(By.TAG_NAME, 'b')
         codea = search_input.text
         # print(f"search_input : {search_input.text}")
@@ -339,17 +336,13 @@ def refresh():
     # print("-->  dans refresh() : rafraichissement...")
     # app.logger.info("Refresh...")
     # le fait de rafraichir par le lien 'Actualiser' relance la dernière commande!
-    # ce n'est pas exactement ce que l'on veut, en repassant par le lien 
+    # ce n'est pas exactement ce que l'on veut, en repassant par le lien
     # 'PILOTAGE ALARME/AUTOMATISMES' cela fonctionne bien mieux.
     try :
         pilot = driver.find_element(By.LINK_TEXT, "PILOTAGE ALARME/AUTOMATISMES")
         pilot.click()
     except WebDriverException as err:
         app.logger.info(f"pb dans refresh() erreur : {err}  ")
-
-# refresh_thread = threading.Thread(target=refresh)
-# refresh_thread.start()
-# # refresh_thread.join()
 
 """  REFRESH :
     <body onload="allowAJAX=true;" onunload="allowAJAX=false;">
@@ -366,22 +359,6 @@ def refresh():
 """
 # /html/body/div/div/div[2]/div[3]
 
-
-# def find_elem():
-#     journal()
-#     # rows = len (driver.find_elements(By.XPATH, "//*[@class='event']/tbody/tr" ))
-#     rows = 2
-#     columns = len (driver.find_elements(By.XPATH, "//*[@class='event']/tbody/tr[2]/td" ))
-#     result_elem = []
-#     for t_column in range(1, (columns + 1)):
-#         XPath = f"//*[@class='event']/tbody/tr[{str(rows)}]/td[{str(t_column)}]"
-#         cell_text = driver.find_element(By.XPATH, XPath).text
-#         result_elem.append(cell_text)
-#         # print(cell_text, end = '      ')
-#     # print("result_elem : ", result_elem)
-#     pilot()
-#     WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.ID, "alarmstate")))
-#     return result_elem
 
 def find_elem():
     # print("-->  dans find_elem() : recuperation des infos de l' alarme en cours'...")
@@ -409,13 +386,13 @@ def find_elem():
 # exemple du journal lors d'une alarme :
 #
 #     Date	    Heure	  Evénements	            Eléments concernés
-#   
+#
 #   30/09/26	16h27	Fin appels tél	            TRANSMETTEUR(123456)
 #   30/09/26	16h26	Mise OFF (Zone ABC)  	    TELECDE ROMU(654321)
 #   30/09/26	16h26	Alarme (Zone A)	            VOL. SALON(135790)
 #   30/09/26	16h26	Début appels tél	        TRANSMETTEUR(123456)
 #   30/09/26	16h23	Mise ON (Zone ABC)	        TRANSMETTEUR(123456)
-    
+
 #   14/10/26	12h27	Mise OFF (Zone ABC)	        CLAVIER LCD(024680)
 #   14/10/26	10h33	Fin appels tél	            TRANSMETTEUR(123456)
 #   14/10/26	10h32	Début appels tél	        TRANSMETTEUR(123456)
@@ -434,7 +411,7 @@ def alarmstate():
     # date_alarme = datetime.now()
     # date_alarme_reset = datetime.now() + timedelta(seconds=60)
 
-    # print("-->  dans alarmstate() : y-a-t-il une alarme ?")  
+    # print("-->  dans alarmstate() : y-a-t-il une alarme ?")
     # <div id="alarmstate">
     #     <div id="alarmstatedetails">
     #             <a href="u_listelmt.htm">Détails</a>
@@ -451,7 +428,7 @@ def alarmstate():
     #     </div>
 
     AF_BTN = {"pbattery_ok": "Piles OK", "pbattery_nok": "Piles faibles",
-              "pcom_ok": "Communication radio OK", 
+              "pcom_ok": "Communication radio OK",
               "pdoor_ok": "Porte ou fenêtre fermée",
               "phouse_ok": "Pas d'alarme", "phouse_int": "Alarme Intrusion",
               "pbox_ok": "Boîtier OK",
@@ -493,7 +470,7 @@ def alarmstate():
                         date = ""
                         heure = ""
                         evenement = ""
-                        element_concerne = ""          
+                        element_concerne = ""
                         for line in rep_find_elem:
                             if 'Piles faibles' in line[2] or 'Alarme' in line[2]:
                                 # or 'Perte reseau gsm' in line[2]   retiré car réseau 2G arrété le 19/10/2026 !
@@ -512,7 +489,7 @@ def alarmstate():
                                 for name, numero in MOBILE.items():
                                     rep_123_sms = send_123_sms(numero, f"{date}  {heure}  {evenement}  {element_concerne}")
                                     app.logger.info(f" réponse envoi 123_sms : {rep_123_sms}")
-                            
+
                         # Alarme VOL.ENTREE.
                         # Alarme VOL.SALON.
                         # Alarme GRENIER.
@@ -542,7 +519,7 @@ def alarmstate():
     ''' 			    Détails  Etat du système
                quand pas alarme :              |           quand alarme :
           class          classe.text           |       class        classe.text
-                                               | 
+                                               |
         pbattery_ok    Piles OK                +   pbattery_nok    Piles faibles
         pcom_ok        Communication radio OK  |
         pdoor_ok       Porte ou fenêtre fermée |
@@ -554,7 +531,7 @@ def alarmstate():
 
 def groupstate():
     # print("-->  dans groupstate() : état des zones alarme  Marche/Arrêt , en alarme Oui/Non...")
-    # print("------ RECUPERATION DE L'ETAT DE L'ALARME'' ------") 
+    # print("------ RECUPERATION DE L'ETAT DE L'ALARME'' ------")
     ### <div id="groupstate"><div id="groupa"><div class="alarmoff ">Arrêté ###
     ### </div><br><div class="noalarm ">Pas d'alarme                        ###
     ### </div></div><div id="groupb"><div class="alarmoff ">Arrêté          ###
@@ -622,7 +599,7 @@ def groupstate():
     # print ("'colorgroupabc', color   :  ", 'colorgroupabc', color)
 
 
-def boucle_principale():    
+def boucle_principale():
     while OK:
         # print("-->  dans boucle principale...")
         # OK = False
@@ -630,7 +607,7 @@ def boucle_principale():
         t_refresh = 310                    # [5mn] temps rafraichissement page (sec.)
         t_cpt = t_refresh // t_boucle      # nb de 't_boucle' total pour avoir 't_refresh'
         v_cpt = 0                          # compteur de 't_boucle'
-        # app.logger.info(f"Actuellement, le taux de rafraichissement est de : {t_refresh//60} mn et {t_refresh%60} sec")            
+        # app.logger.info(f"Actuellement, le taux de rafraichissement est de : {t_refresh//60} mn et {t_refresh%60} sec")
         while True:
             try:
                 v_cpt += 1
@@ -695,13 +672,13 @@ def boucle_principale():
                     cde = None
                 time.sleep(t_boucle)
                 if v_cpt > t_cpt:
-                    refresh()         # permet le rafraichissement de la fenêtre de pilotage
-                    v_cpt = 0         # des automatismes tous les 't_refresh' secondes.
+                    refresh()         # permet le rafraichissement de la fenêtre de pilotage des automatismes
+                    v_cpt = 0         # tous les 't_refresh' secondes.
                 # print(f"boucle : {v_cpt}")
             except WebDriverException as err:
                 # trouverInstanceServeur()
                 app.logger.info(f"boucle principale, erreur WebDriverException : {err} ")
-                # login()    
+                # login()
                 # pilot()
             except Exception as err:
                 app.logger.info(f"boucle principale, erreur Exception Python: {err} ")
@@ -710,13 +687,13 @@ def boucle_principale():
                 # print(f"sleep 1sec.")
 
 def main():
-    login()    
+    login()
     pilot()
     boucle_principale()
 
 if __name__ == "__main__":
         main()
-        
+
 #   driver.quit()
 #   send_sms_free("L'application monitoring de la centrale s'est terminée anormalement")
 
@@ -756,22 +733,22 @@ if __name__ == "__main__":
 <form method="post" action="u_pilotage.htm" name="u_pilotage">
     <input type="hidden" name="hidden" value="hidden">
     <div id="groupdrive">
-        <input type="submit" name="btn_zone_on_A" value="Marche A" class="emptydark"> 
-        <input type="submit" name="btn_zone_on_B" value="Marche B" class="emptydark"> 
-        <input type="submit" name="btn_zone_on_C" value="Marche C" class="emptydark"> 
-        <input type="submit" name="btn_zone_on_ABC" value="Marche A B C" class="longemptydark"> 
+        <input type="submit" name="btn_zone_on_A" value="Marche A" class="emptydark">
+        <input type="submit" name="btn_zone_on_B" value="Marche B" class="emptydark">
+        <input type="submit" name="btn_zone_on_C" value="Marche C" class="emptydark">
+        <input type="submit" name="btn_zone_on_ABC" value="Marche A B C" class="longemptydark">
         <input type="submit" name="btn_zone_off_ABC" value="Arrêt A B C" class="fatemptydark">
     </div>
     <div id="stuffdrive">
         <div id="shutterdrive">
-            <input type="submit" name="btn_vol_up" value="" class="shutterupdark"> 
-            <input type="submit" name="btn_vol_stop" value="" class="shutterstopdark"> 
+            <input type="submit" name="btn_vol_up" value="" class="shutterupdark">
+            <input type="submit" name="btn_vol_stop" value="" class="shutterstopdark">
             <input type="submit" name="btn_vol_down" value="" class="shutterdowndark">
         </div>
         <div id="shutterimg">&nbsp;
         </div>
         <div id="lightdrive">
-            <input type="submit" name="btn_lum_on" value="ON" class="roundemptydark"> 
+            <input type="submit" name="btn_lum_on" value="ON" class="roundemptydark">
             <input type="submit" name="btn_lum_off" value="OFF" class="roundemptydark">
         </div>
         <div id="lightimg">&nbsp;
@@ -824,16 +801,3 @@ UnknownMethodException ([msg, écran, trace de pile])  La commande demandée cor
 WebDriverException ([msg, écran, trace de pile])      Exception du pilote Web de base.
 
 """
-
-
-
-
-
-
-
-
-
-
-
-
-

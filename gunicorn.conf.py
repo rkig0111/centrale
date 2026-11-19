@@ -22,10 +22,10 @@
 #       range.
 #
 
-bind = '192.168.0.17:4443'
+bind = '192.168.0.40:4443'
 backlog = 2048
-certfile = '/home/romu/developpement/certificate.pem'
-keyfile = '/home/romu/developpement/key.pem'
+certfile = '/home/kligliro/developpement/centrale/certificate.pem'
+keyfile = '/home/kligliro/developpement/centrale/key.pem'
 #
 # Worker processes
 #

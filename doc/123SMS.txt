@@ -57,7 +57,7 @@ if __name__ == "__main__":
 
 
 
-TARIFS:
+TARIFS (fin 2026):
 
 
 Quantité    PU HT       Total HT    Total TTC

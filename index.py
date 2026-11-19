@@ -5,7 +5,7 @@ from flask import Flask, request, render_template
 import datetime
 import memcache
 import logging
-# from werkzeug.middleware.proxy_fix import ProxyFix    
+# from werkzeug.middleware.proxy_fix import ProxyFix
 
 # Application Flask
 app = Flask(__name__)   # le nom app est utilisé par le fichier wsgi, on récupère ici 'index'
@@ -22,7 +22,7 @@ handler.setFormatter(formatter)
 app.logger.addHandler(handler)
 logging.getLogger("werkzeug").addHandler(handler)
 
-shared = memcache.Client(['127.0.0.1:11211'], debug=0)
+shared = memcache.Client(['127.0.0.1:11211'], debug=1)
 
 # Page HTML de base
 pageHTML = "index.html"
@@ -57,12 +57,12 @@ def index():
 if __name__ == "__main__":
     # app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
     # app.run(port=443, ssl_context=("localhost+3.pem", "localhost+3-key.pem"))
-    app.run(host='192.168.0.17', debug = False)    #   port 5000 par defaut, port=80  avec sudo
+    app.run(host='192.168.0.40', debug = False)    #   port 5000 par defaut, port=80  avec sudo
 
-    
+
 """
-# si le port 4443 est utilisé, on ferme 'gunicorn' qui empêche l'application index.py de se lancer.
-# si on relance index.py étant déjà lancé, il se ferme automatiquement après quelques essais de connexion.
+# portion de code pour tuer le pid de gunicorn qui empêche l'application index.py de se relancer.
+# mais je ne l'utilise plus.
 
 cmd = "sudo ss -tlpn sport = :4443"
 cmdarray = cmd.split()
@@ -73,16 +73,16 @@ shell_cmd = subprocess.run(cmdarray, stdout=subprocess.PIPE, stderr=subprocess.P
 lines = []
 line = ""
 result =""
-for x in shell_cmd.stdout:    
+for x in shell_cmd.stdout:
     if x == "\n":
         lines.append(line)
-        line = "" 
+        line = ""
     else:
         line += x
 
 for line in lines:
     if 'pid' in line:
-        # print(line)        
+        # print(line)
         result = line.split()
         print(result[5])
 
@@ -91,7 +91,7 @@ liste_pid=re.findall(pattern, result[5])
 
 # >>> liste_pid
 # ['pid=3702', 'pid=3701', 'pid=3700', 'pid=3699', 'pid=3697']
-# >>> liste_pid[-1]         # c'est le dernier processus de la liste qu'il faut tuer 
+# >>> liste_pid[-1]         # c'est le dernier processus de la liste qu'il faut tuer
 # 'pid=3697'                # qui est en fait le 1er lancé. ( id le plus petit )!
 # >>> liste_pid[-1].split('=')
 # ['pid', '3697']
@@ -114,12 +114,12 @@ except OSError:
 
 # ['LISTEN', '0', '2048', '192.168.0.17:4443', '0.0.0.0:*', 'users:(("gunicorn",pid=3702,fd=3),("gunicorn",pid=3701,fd=3),("gunicorn",pid=3700,fd=3),("gunicorn",pid=3699,fd=3),("gunicorn",pid=3697,fd=3))']
 #      0      1      2             3                4                     5
-# 
+#
 # 'users:(
 # ("gunicorn",pid=3702,fd=3),
 # ("gunicorn",pid=3701,fd=3),
 # ("gunicorn",pid=3700,fd=3),
 # ("gunicorn",pid=3699,fd=3),
-# ("gunicorn",pid=3697,fd=3))    <----  os.kill(pid, signal.SIGTERM) 
+# ("gunicorn",pid=3697,fd=3))    <----  os.kill(pid, signal.SIGTERM)
 
 """

@@ -1,23 +1,87 @@
-pour travailler avec git en local, j'ai prévu de travailler avec git 
-avec le serveur(mon PC de developpement) et d'y accéder grace à ssh.
+INSTALLATION DE L'ENVIRONNEMENT DE TRAVAIL:
+EN VRAC!!!
 
-sudo apt install sshfs
-mkdir ~/mon_dossier_sftp
-sshfs utilisateur@serveur_distant:chemin/distant ~/mon_dossier_sftp
-aller dans le repertoire destinataire du clone:
-cd rep_clone
-git clone SELENIUM
-ln -s ~/mon_dossier_sftp ~/mon_lien
-fusermount -u ~/mon_dossier_sftp
+adaptez tous les PATH en conséquence !
 
-cd SELENIUM
-python -m venv .centrale
+tous mes projets sont dans ~/developpement/:
+    cd /home/romu/developpement/
+
+    mkdir SELENIUM
+    cd SELENIUM
+    python -m venv .centrale
+    source .centrale/bin/activate
+    pip install -r requirements.txt
+
+    sudo apt-get install chromium-chromedriver
+# pour savoir où se trouve l'executable chromedriver, on en a besoin dans centrale.py (variable 'service')
+    which chromedriver   
+
+# il faut remplir impérativement le fichier 'centrale.ini' qui centralise un peu toutes les variables dont ont a besoin.
+# c' est assez explicite. besoin surtout de l' adresse IP de la centrale et des codes d'accès pour s'y connecter.
+
+Dans le script 'centrale.py' j'ai essayé de documenter un max de choses en allant.
+j'espère seulement être le plus compréhensible possible..  ;-)
+
+###########################################
+
+pip install python-memcached
+cela permet de partager les variables entre le serveur.py web et l'application centrale.py
+
+# par exemple dans le script index.py:
+import memcache
+shared = memcache.Client(['127.0.0.1:11211'], debug=0)
+shared.set('OnOff', cde_bouton, time=5)     #  les valeurs transmise par cde_bouton: 
+                                               'Marche A', 'Marche B', 'Marche C', 'Marche A B C', 'Arrêt A B C,' 'Test'
+
+# dans le script centrale.py:
+import memcache
+shared = memcache.Client(['127.0.0.1:11211'], debug=0) 
+cde = shared.get('OnOff')   
+print(cde)
+
+
+###########################################
+
+pour tester manuellement l'ensemble:
+
+
+cd /home/romu/developpement/SELENIUM
 source .centrale/bin/activate
-pip install selenium
-# pip install webdriver_manager
-sudo apt-get install chromium-chromedriver
-which chromedriver
+python /home/romu/developpement/SELENIUM/centrale.py
 
+commentez la ligne pour voir selenium piloter les pages web:
+    options.add_argument("--headless=new")
+ 
+ 
+adaptez les PATH dans le fichier centrale.sh 
+ce script est lancé lors du démarrage du Rasperry pi si vous voulez
+que l' application se lance automatiquement.
+
+
+screen -d -m -S index gunicorn 'index:app'
+screen -d -m -S centrale python /home/kligliro/developpement/centrale/centrale/centrale.py
+
+j'utilise screen, cela me permet de me connecter à distance et de rappeler le(s) termina(l-aux) avec 
+    screen - r centrale  # et/ou 
+    screen - r index
+pour voir si tout fonctionne comme attendu.
+    ctrl A + d   # pour quitter mais pas fermer le terminal.
+pour savoir si les 2 tournent:
+    screen -ls
+       
+###########################################
+
+pip install gunicorn
+pour tester :
+    gunicorn --bind 0.0.0.0:8000 --workers 1 'centrale:app'
+
+au final, on utilisera de préférence le fichier de config (gunicorn.conf.py)
+et en lancant tout simplement :
+
+    gunicorn 'centrale:app'
+
+
+###########################################
 
 ######   INSTALL NGINX    #######
 
@@ -43,8 +107,9 @@ server {
 }
 EOF
 
+pour accéder à votre Raspberry pi de l'extérieur avec votre nom de domaine (entre crochet)
 
-sudo tee /etc/nginx/sites-available/joroadju.freeboxos.fr << 'EOF'
+sudo tee /etc/nginx/sites-available/[xxxxxx.freeboxos.fr] << 'EOF'      
 server {
     listen 80;
     server_name centrale.local;
@@ -59,7 +124,7 @@ server {
 EOF
 
 
-# sudo ln -s /etc/nginx/sites-available/joroadju.freeboxos.fr /etc/nginx/sites-enabled/
+# sudo ln -s /etc/nginx/sites-available/xxxxxx.freeboxos.fr /etc/nginx/sites-enabled/
 # sudo nano /etc/nginx/sites-available/centrale.conf
 # sudo ln -s /etc/nginx/sites-available/centrale.conf /etc/nginx/sites-enabled/
 
@@ -74,7 +139,7 @@ sudo rm /etc/nginx/sites-enabled/default
 apt-get update
 apt-get  install certbot python3-certbot-nginx
 
-sudo certbot --nginx -d joroadju.freeboxos.fr
+sudo certbot --nginx -d xxxxxx.freeboxos.fr
 
 sudo ufw allow 'Nginx Full'
 sudo ufw allow OpenSSH
@@ -82,6 +147,9 @@ sudo ufw enable
 sudo ufw status
 
 
+
+###########################################
+EXEMPLE UTILISATION FLASK
 ###########################################
 
 pip install flask
@@ -137,69 +205,3 @@ if __name__=='__main__':
     app.run(debug=True, port=5000, host='0.0.0.0',threaded=True)
     #local web server http://192.168.1.200:5000/
     #after Port forwarding Manipulation http://xx.xx.xx.xx:5000/
-
-
-
-###########################################
-
-pip install python-memcached
-
-# dans le 1er script:
-import memcache
-shared = memcache.Client(['127.0.0.1:11211'], debug=0)
-shared.set('Value', 'Hello_bis_2', time=5)
-
-# dans le 2eme script:
-import memcache
-shared = memcache.Client(['127.0.0.1:11211'], debug=0)    
-print(shared.get('Value'))
-
-
-###########################################
-
-pour démarrage auto à la mise en route du Raspberry Pi:
-
-#! /usr/bin/bash
-cd /home/romu/developpement/SELENIUM
-source .centrale/bin/activate
-python /home/romu/developpement/SELENIUM/centrale.py
-
-
-###########################################
-
-pip install gunicorn
-gunicorn --bind 0.0.0.0:8000 --workers 1 'centrale:app'
-
-
-###########################################
-
-
-
-à enlever :
-
-pip install fastapi uvicorn
-creer le fichier main.py
----------
-from fastapi import FastAPI
-app = FastAPI()
-
-donnees = {‘lieux’: [‘Paris’,’Lyon’,’Marseille’]}
-
-@app.get(‘/lieux’)
-async def get_lieux():
-  return {‘donnees’: donnees}
-
-@app.post(‘/lieux’)
-async def post_lieu(lieu: str):
-  if lieu in donnees[‘lieux’]:
-    return {‘donnees’: donnees, ‘message’: ‘existe déjà’}
-  donnees[‘lieux’].append(lieu)
-  return {‘donnees’: donnees, ‘message’: ‘ajouté’}
-
-@app.delete(‘/lieux’)
-async def delete_lieu(lieu: str):
-  if lieu in donnees[‘lieux’]:
-    donnees[‘lieux’].remove(lieu)
-    return {‘donnees’: donnees, ‘message’:’supprimé’}
-  return {‘donnees’: donnees, ‘message’: « n’existe pas »}
----------

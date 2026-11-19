@@ -1,8 +1,10 @@
 # created by virtualenv automatically
 /bin
 /__pycache__
+web/__pycache__
 /chrome*
 /lib
 centrale.ini
+centrale.log
 .centrale
 /tests

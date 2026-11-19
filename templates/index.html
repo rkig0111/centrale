@@ -1,18 +1,14 @@
-<!-- index.html -->
-<!-- <form method="POST" action="/">
-    <button type="submit" name="action" value="allumer">Allumer</button>
-    <button type="submit" name="action" value="éteindre">éteindre</button>
-</form> -->
-
 <!DOCTYPE HTML>
 <html>
     <head>
         <title> Centrale </title>
+        
         <!--<meta http-equiv='content-type' content='text/html; charset=UTF-8'>
         <meta name='apple-mobile-web-app-capable' content='yes' />
         <meta name='apple-mobile-web-app-status-bar-style' content='black-translucent' />      
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script> 
         <link rel="icon" href="../static/somfy.ico" type="image/x-icon">--> 
+        
         <meta http-equiv="refresh" content="3">
         <link rel="stylesheet" href='../static/centrale.css'/>
         <!-- 
@@ -42,25 +38,17 @@
         <h2><center> Zones à activer / désactiver </center></h2>-->
         <h1 style='color : #3AAA35;'><center> {{title}} </center></h1>
         <div id='btnContainer'>  
-            <form method="POST" action="/">                
-            <!--<center>
-                <strong>
-                    ZONE &nbsp; ABC &ensp;&ensp;&ensp; 
-                    ZONE &nbsp; A &ensp;&ensp;&ensp; 
-                    ZONE &nbsp; B &ensp;&ensp;&ensp; 
-                    ZONE &nbsp; C 
-                </strong> 
-            </center>-->        
+            <form method="POST" action="/">  
             <center>
-                <button id='zonea' class="colora" type="submit" name="action" value="Marche A">Allumer<br>A </button>
-                <button id='zoneb' class="colorb" type="submit" name="action" value="Marche B">Allumer<br>B </button>
-                <button id='zonec' class="colorc" type="submit" name="action" value="Marche C">Allumer<br>C </button>
+                <button id='zonea' class="colora" type="submit" name="action" value="Marche A">Activer Zone<br>A </button>
+                <button id='zoneb' class="colorb" type="submit" name="action" value="Marche B">Activer Zone<br>B </button>
+                <button id='zonec' class="colorc" type="submit" name="action" value="Marche C">Activer Zone<br>C </button>
             </center>             
             <center>
-                <button id='zoneabcon' class="colorabc" type="submit" name="action" value="Marche A B C">Allumer<br>ABC</button>
+                <button id='zoneabcon' class="colorabc" type="submit" name="action" value="Marche A B C">Activer Zones<br>A B C</button>
             </center>            
             <center>                                                                                  
-                <button id='zoneabcoff' class="colorabc" type="submit" name="action" value="Arrêt A B C">éteindre<br>ABC</button>
+                <button id='zoneabcoff' class="colorabc" type="submit" name="action" value="Arrêt A B C">Désactiver Zones<br>A B C</button>
                 <button id='zonetest' class="colorabc" type="submit" name="action" value="Test">bouton<br>TEST</button>
             </center>  
             </form>
