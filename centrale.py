@@ -43,18 +43,18 @@ import urllib.parse
 import urllib.request
 import shutil
 
-def trouverInstanceServeur():
-    for proc in psutil.process_iter(['pid', 'name', 'cmdline']):
-        try:
-            # Récupère les informations du processus
-            cmdline = proc.info['cmdline']
-            if cmdline:
-                if len(cmdline) ==2:          # ['python3', '/home/romu/developpement/SELENIUM/web/index.py']
-                    if '/SELENIUM/web/index.py' in cmdline[1]:
-                        #print(f"on peut effacer le fichier ayant le pid : {proc.info['pid']}")
-                        psutil.Process(proc.info['pid']).terminate()
-        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
-            continue
+# def trouverInstanceServeur():
+#     for proc in psutil.process_iter(['pid', 'name', 'cmdline']):
+#         try:
+#             # Récupère les informations du processus
+#             cmdline = proc.info['cmdline']
+#             if cmdline:
+#                 if len(cmdline) ==2:          # ['python3', '/home/romu/developpement/SELENIUM/web/index.py']
+#                     if '/centrale/index.py' in cmdline[1]:
+#                         #print(f"on peut effacer le fichier ayant le pid : {proc.info['pid']}")
+#                         psutil.Process(proc.info['pid']).terminate()
+#         except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+#             continue
 
 # trouverInstanceServeur()     # on supprime l'éventuel 'serveur web' qui pourrait encore tourner !'
 
@@ -205,7 +205,7 @@ if chromium_path:
 
 options.add_argument('--ignore-certificate-errors')
 options.add_argument("--incognito")
-options.add_argument("--headless=new")
+# options.add_argument("--headless=new")
 options.add_argument("--no-sandbox")
 options.add_argument("--disable-dev-shm-usage")
 options.add_argument("--window-size=1024,768")
@@ -683,8 +683,8 @@ def boucle_principale():
                     v_cpt = 0         # tous les 't_refresh' secondes.
                 # print(f"boucle : {v_cpt}")
             except WebDriverException as err:
-                # trouverInstanceServeur()
                 app.logger.info(f"boucle principale, erreur WebDriverException : {err} ")
+                # trouverInstanceServeur()
                 # login()
                 # pilot()
             except Exception as err:
@@ -695,7 +695,9 @@ def boucle_principale():
 
 def main():
     login()
+    time.sleep(0.5)
     pilot()
+    time.sleep(0.5)
     boucle_principale()
 
 if __name__ == "__main__":

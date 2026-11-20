@@ -6,5 +6,6 @@ web/__pycache__
 /lib
 centrale.ini
 centrale.log
+cron_centrale.log
 .centrale
 /tests

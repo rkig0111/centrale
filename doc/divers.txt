@@ -8,72 +8,84 @@ dans votre répertoire home
     mkdir developpement
     cd developpement
     git clone https://github.com/rkig0111/centrale.git
-aller dans le répertoire nouvellemnt créé :
+aller dans le répertoire nouvellement créé :
     cd centrale
 y créer l'environnement virtuel :
     python3 -m venv .centrale
 l'activer :
     source .centrale/bin/activate
 créer toutes les dépendances que nous aurons besoin :
-    pip install -r requirements.txt 
+    pip install -r requirements.txt
 
     sudo apt-get install chromium-chromedriver
 # pour savoir où se trouve l'executable chromedriver, on en a besoin dans centrale.py (variable 'service')
-    which chromedriver   
+    which chromedriver
+    ps: je l' ai intégré dans le script.
 
-# il faut adapter le fichier 'centrale_a_modifier.ini' à sa configuration et le renommer 'centrale.ini'. Il centralise un peu toutes les variables dont ont a besoin.
+# il faut adapter le fichier 'centrale_a_modifier.ini' à sa propre configuration et le renommer 'centrale.ini'.
+# Il centralise un peu toutes les variables dont ont a besoin.
 # c'est assez explicite. besoin surtout de l' adresse IP de la centrale et des codes d'accès pour s'y connecter.
 
 Dans le script 'centrale.py' j'ai essayé de documenter un max de choses en allant.
 j'espère seulement être le plus compréhensible possible..  ;-)
 
 ###########################################
+quelques infos sur memcache :
 
-pip install python-memcached
-cela permet de partager les variables entre le serveur.py web et l'application centrale.py
+cela permet de partager les variables entre le index.py web et l'application centrale.py
 
 # par exemple dans le script index.py:
 import memcache
 shared = memcache.Client(['127.0.0.1:11211'], debug=0)
-shared.set('OnOff', cde_bouton, time=5)     #  les valeurs transmise par cde_bouton: 
+shared.set('OnOff', cde_bouton, time=5)     #  les valeurs transmise par cde_bouton:
                                                'Marche A', 'Marche B', 'Marche C', 'Marche A B C', 'Arrêt A B C,' 'Test'
 
 # dans le script centrale.py:
 import memcache
-shared = memcache.Client(['127.0.0.1:11211'], debug=0) 
-cde = shared.get('OnOff')   
+shared = memcache.Client(['127.0.0.1:11211'], debug=0)
+cde = shared.get('OnOff')
 print(cde)
 
+je sais... programmation 'old age' !
 
 ###########################################
 
 pour tester manuellement l'ensemble:
 
-
-cd /home/romu/developpement/SELENIUM
+cd ~/developpement/centrale
 source .centrale/bin/activate
-python /home/romu/developpement/SELENIUM/centrale.py
+python centrale.py
 
 commentez la ligne pour voir selenium piloter les pages web:
     options.add_argument("--headless=new")
- 
- 
-adaptez les PATH dans le fichier centrale.sh 
-ce script est lancé lors du démarrage du Rasperry pi si vous voulez
-que l' application se lance automatiquement.
 
+
+si vous voulez que l' application se lance automatiquement, + d'1 possibilités.
+j'ai choisi la bonne vieille méthode (mais efficace) : CRON
+pour paramétrer 'cron':
+    crontab -e
+rajouter la ligne suivante en ajustant votre PATH:
+    @reboot /home/romu/developpement/centrale/centrale.sh  >> /home/romu/developpement/centrale/cron_centrale.log 2>&1
+
+c'est le fichier 'centrale.sh' qui sera lancé à chaque reboot du Raspberry pi.
+
+###########################################
+utilisation de screen
 
 screen -d -m -S index gunicorn 'index:app'
 screen -d -m -S centrale python /home/kligliro/developpement/centrale/centrale/centrale.py
 
-j'utilise screen, cela me permet de me connecter à distance et de rappeler le(s) termina(l-aux) avec 
-    screen - r centrale  # et/ou 
+j'utilise screen, cela me permet de me connecter à distance et de rappeler le(s) termina(l-aux) avec
+    screen - r centrale
+et/ou
     screen - r index
 pour voir si tout fonctionne comme attendu.
-    ctrl A + d   # pour quitter mais pas fermer le terminal.
+
+pour quitter mais pas fermer le terminal:
+    ctrl A + d
 pour savoir si les 2 tournent:
     screen -ls
-       
+
 ###########################################
 
 pip install gunicorn
@@ -114,7 +126,7 @@ EOF
 
 pour accéder à votre Raspberry pi de l'extérieur avec votre nom de domaine (entre crochet)
 
-sudo tee /etc/nginx/sites-available/[xxxxxx.freeboxos.fr] << 'EOF'      
+sudo tee /etc/nginx/sites-available/[xxxxxx.freeboxos.fr] << 'EOF'
 server {
     listen 80;
     server_name centrale.local;
@@ -136,7 +148,7 @@ EOF
 # rentre en conflit avec notre config sur le port 80
 # on supprime le lien par defaut :
 
-sudo rm /etc/nginx/sites-enabled/default      
+sudo rm /etc/nginx/sites-enabled/default
 
 
 
@@ -155,6 +167,7 @@ sudo ufw status
 
 ###########################################
 EXEMPLE UTILISATION FLASK
+/!\ aucun rapport avec notre application !
 ###########################################
 
 pip install flask
@@ -181,11 +194,11 @@ templateData={
 def getData():
     data=[]
     for i,dp in enumerate(dataPin): data.append(GPIO.input(dataPin[i]))
-    
+
     return data
 
 app=Flask(__name__)
-    
+
 @app.route('/')
 def index():
     #return 'hello world!'
@@ -198,13 +211,13 @@ def index():
         'data':data,
     }
     #return render_template('rpi_index.html',**templateData)
-    return render_template('rpi3b_webcontroller.html',**templateData)           
+    return render_template('rpi3b_webcontroller.html',**templateData)
 
-@app.route('/<actionid>') 
+@app.route('/<actionid>')
 def handleRequest(actionid):
     print("Button pressed : {}".format(actionid))
-    return "OK 200"   
-                              
+    return "OK 200"
+
 if __name__=='__main__':
     os.system("sudo rm -r  ~/.cache/chromium/Default/Cache/*")
     app.run(debug=True, port=5000, host='0.0.0.0',threaded=True)
