@@ -12,7 +12,7 @@ echo "lancement du serveur web, notre interface avec la programme de surveillanc
 # cd /home/romu/developpement/SELENIUM && source .centrale/bin/activate && screen -d -m -S index gunicorn --certfile=/PATH/certificate.pem --keyfile=/PATH/key.pem --bind 192.168.0.40:4443 --workers 4 'index:app'
 
 # version https avec le fichier gunicorn.conf.py
-cd /home/kligliro/developpement/centrale/centrale && source ../.centrale/bin/activate && screen -d -m -S index gunicorn 'index:app'
+cd ~/developpement/centrale && source .centrale/bin/activate && screen -d -m -S index gunicorn 'index:app'
 
 echo "lancement du prg centrale.py (surveille notre centrale par son interface web intégrée et met à jour notre serveur web lanncé ci-dessus))"
-cd /home/kligliro/developpement/centrale/centrale && source ../.centrale/bin/activate && screen -d -m -S centrale python /home/kligliro/developpement/centrale/centrale/centrale.py
+cd ~/developpement/centrale && source .centrale/bin/activate && screen -d -m -S centrale python ~/developpement/centrale/centrale.py

@@ -22,10 +22,10 @@
 #       range.
 #
 
-bind = '192.168.0.40:4443'
+bind = '192.168.0.17:4443'
 backlog = 2048
-certfile = '/home/kligliro/developpement/centrale/certificate.pem'
-keyfile = '/home/kligliro/developpement/centrale/key.pem'
+certfile = '~/developpement/certificate.pem'
+keyfile = '~/developpement/key.pem'
 #
 # Worker processes
 #
