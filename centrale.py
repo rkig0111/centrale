@@ -161,7 +161,8 @@ options = webdriver.ChromeOptions()
 chromium_path = shutil.which("chromium-browser")
 service = Service(shutil.which("chromedriver"))
 
-options.binary_location = chromium_path
+if chromium_path:
+    options.binary_location = chromium_path
 
 # if platform.machine() == "aarch64":                # Raspberry pi
 #     chromium_path = r"/usr/bin/chromium-browser"
