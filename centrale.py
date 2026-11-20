@@ -41,6 +41,7 @@ from index import app
 from datetime import datetime, timedelta
 import urllib.parse
 import urllib.request
+import shutil
 
 def trouverInstanceServeur():
     for proc in psutil.process_iter(['pid', 'name', 'cmdline']):
@@ -157,14 +158,19 @@ for name, value in parser.items('authentification'):
 
 options = webdriver.ChromeOptions()
 
-if platform.machine() == "aarch64":                # Raspberry pi
-    chromium_path = r"/usr/bin/chromium-browser"
-    service = Service(r"/usr/bin/chromedriver")
-    options.binary_location = chromium_path
-else:
-    chromium_path = r"/usr/bin/chromium-browser"  # mon linux AMD
-    service = Service(r"/home/kligliro/.local/bin/chromedriver")
-    options.binary_location = chromium_path
+chromium_path = shutil.which("chromium-browser")
+service = Service(shutil.which("chromedriver"))
+
+options.binary_location = chromium_path
+
+# if platform.machine() == "aarch64":                # Raspberry pi
+#     chromium_path = r"/usr/bin/chromium-browser"
+#     service = Service(r"/usr/bin/chromedriver")
+#     options.binary_location = chromium_path
+# else:
+#     chromium_path = r"/usr/bin/chromium-browser"  # mon linux AMD
+#     service = Service(r"/home/kligliro/.local/bin/chromedriver")
+#     options.binary_location = chromium_path
 
 # Pour le passage des options à Selenium avec python, obtenu des infos sur Stack Overflow :
 # Source - https://stackoverflow.com/a/76364265/home/kligliro/.local/bin/chromedriver
