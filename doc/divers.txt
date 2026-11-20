@@ -1,16 +1,21 @@
 INSTALLATION DE L'ENVIRONNEMENT DE TRAVAIL:
 EN VRAC!!!
 
-adaptez tous les PATH en conséquence !
+adaptez tous les PATH en conséquence si besoin!
 
 tous mes projets sont dans ~/developpement/:
-    cd /home/romu/developpement/
-
-    mkdir SELENIUM
-    cd SELENIUM
-    python -m venv .centrale
+dans votre répertoire home
+    mkdir developpement
+    cd developpement
+    git clone https://github.com/rkig0111/centrale.git
+aller dans le répertoire nouvellemnt créé :
+    cd centrale
+y créer l'environnement virtuel :
+    python3 -m venv .centrale
+l'activer :
     source .centrale/bin/activate
-    pip install -r requirements.txt
+créer toutes les dépendances que nous aurons besoin :
+    pip install -r requirements.txt 
 
     sudo apt-get install chromium-chromedriver
 # pour savoir où se trouve l'executable chromedriver, on en a besoin dans centrale.py (variable 'service')

@@ -21,11 +21,24 @@
 #       Must be a positive integer. Generally set in the 64-2048
 #       range.
 #
+import os
+import socket
+# pour récupérer automatiquement son HOME PATH
+home = os.environ.get("HOME")
 
-bind = '192.168.0.17:4443'
+# pour récupérer automatiquement son adresse IP
+def get_local_ip():
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+        # Aucun paquet n'est réellement envoyé (UDP)
+        s.connect(("8.8.8.8", 80))
+        return s.getsockname()[0]
+
+ip = get_local_ip()
+
+bind = ip + ':4443'
 backlog = 2048
-certfile = '~/developpement/certificate.pem'
-keyfile = '~/developpement/key.pem'
+certfile = home + '/developpement/certificate.pem'
+keyfile = home + '/developpement/key.pem'
 #
 # Worker processes
 #
